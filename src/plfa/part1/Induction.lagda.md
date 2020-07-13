@@ -76,10 +76,16 @@ that a newly introduced operator is associative but not commutative.
 Give another example of a pair of operators that have an identity
 and are associative, commutative, and distribute over one another.
 (You do not have to prove these properties.)
+```
+-- ans: vector addition and scalar addition/multiplication
+```
 
 Give an example of an operator that has an identity and is
 associative but is not commutative.
 (You do not have to prove these properties.)
+```
+-- ans: non-abelian group operations (e.g. square matrix multiplication)
+```
 
 
 ## Associativity
@@ -702,7 +708,72 @@ first four days using a finite story of creation, as
 [earlier]({{ site.baseurl }}/Naturals/#finite-creation).
 
 ```
--- Your code goes here
++-assoc-day-zero : ∀ (m n : ℕ) → (0 + m) + n ≡ 0 + (m + n)
++-assoc-day-zero m n =
+  begin
+    (0 + m) + n
+  ≡⟨⟩
+    m + n
+  ≡⟨⟩
+    0 + (m + n)
+  ∎
+
++-assoc-day-one : ∀ (m n : ℕ) → (1 + m) + n ≡ 1 + (m + n)
++-assoc-day-one m n =
+  begin
+    (1 + m) + n
+  ≡⟨⟩
+    suc (0 + m) + n
+  ≡⟨⟩
+    suc ((0 + m) + n)
+  ≡⟨ cong suc (+-assoc-day-zero m n) ⟩
+    suc (0 + (m + n))
+  ≡⟨⟩
+    1 + (m + n)
+  ∎
+
+
++-assoc-day-two : ∀ (m n : ℕ) → (2 + m) + n ≡ 2 + (m + n)
++-assoc-day-two m n =
+  begin
+    (2 + m) + n
+  ≡⟨⟩
+    suc (1 + m) + n
+  ≡⟨⟩
+    suc ((1 + m) + n)
+  ≡⟨ cong suc (+-assoc-day-one m n) ⟩
+    suc (1 + (m + n))
+  ≡⟨⟩
+    2 + (m + n)
+  ∎
+
++-assoc-day-three : ∀ (m n : ℕ) → (3 + m) + n ≡ 3 + (m + n)
++-assoc-day-three m n =
+  begin
+    (3 + m) + n
+  ≡⟨⟩
+    suc (2 + m) + n
+  ≡⟨⟩
+    suc ((2 + m) + n)
+  ≡⟨ cong suc (+-assoc-day-two m n) ⟩
+    suc (2 + (m + n))
+  ≡⟨⟩
+    3 + (m + n)
+  ∎
+
++-assoc-day-four : ∀ (m n : ℕ) → (4 + m) + n ≡ 4 + (m + n)
++-assoc-day-four m n =
+  begin
+    (4 + m) + n
+  ≡⟨⟩
+    suc (3 + m) + n
+  ≡⟨⟩
+    suc ((3 + m) + n)
+  ≡⟨ cong suc (+-assoc-day-three m n) ⟩
+    suc (3 + (m + n))
+  ≡⟨⟩
+    4 + (m + n)
+  ∎
 ```
 
 ## Associativity with rewrite
@@ -868,7 +939,11 @@ just apply the previous results which show addition
 is associative and commutative.
 
 ```
--- Your code goes here
++-swap : ∀ (m n p : ℕ) → m + (n + p) ≡ n + (m + p)
++-swap m n p rewrite sym (+-assoc m n p)
+                   | +-comm m n
+                   | +-assoc n m p
+                   = refl
 ```
 
 
@@ -881,7 +956,11 @@ Show multiplication distributes over addition, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```
--- Your code goes here
+*-distrib-+ : ∀ (m n p : ℕ) → (m + n) * p ≡ m * p + n * p
+*-distrib-+ zero n p = refl
+*-distrib-+ (suc m) n p rewrite *-distrib-+ m n p
+                              | +-assoc p (m * p) (n * p)
+                              = refl
 ```
 
 
@@ -894,7 +973,11 @@ Show multiplication is associative, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```
--- Your code goes here
+*-assoc : ∀ (m n p : ℕ) → (m * n) * p ≡ m * (n * p)
+*-assoc zero n p = refl
+*-assoc (suc m) n p rewrite *-distrib-+ n (m * n) p
+                          | *-assoc m n p
+                          = refl
 ```
 
 
@@ -908,7 +991,45 @@ for all naturals `m` and `n`.  As with commutativity of addition,
 you will need to formulate and prove suitable lemmas.
 
 ```
--- Your code goes here
+*-zeroʳ : ∀ (n : ℕ) → n * zero ≡ zero
+*-zeroʳ zero = refl
+*-zeroʳ (suc n) =
+  begin
+    suc n * zero
+  ≡⟨⟩
+    (1 + n) * zero
+  ≡⟨ *-distrib-+ 1 n zero ⟩
+    zero + n * zero
+  ≡⟨⟩
+    n * zero
+  ≡⟨ *-zeroʳ n ⟩
+    zero
+  ∎
+
+*-identityʳ : ∀ (n : ℕ) → n * 1 ≡ n
+*-identityʳ zero = refl
+*-identityʳ (suc n) rewrite *-identityʳ n = refl
+
+*-distribˡ-+ : ∀ (m n p : ℕ) → p * (m + n) ≡ p * m + p * n
+*-distribˡ-+ m n zero = refl
+*-distribˡ-+ m n (suc p) rewrite *-distribˡ-+ m n p
+                               | +-rearrange m n (p * m) (p * n)
+                               | +-comm n (p * m)
+                               | sym (+-rearrange m (p * m) n (p * n)) = refl
+
+*-comm : ∀ (m n : ℕ) → m * n ≡ n * m
+*-comm zero n rewrite *-zeroʳ n = refl
+*-comm (suc m) n rewrite *-distribˡ-+ m 1 n
+                       | *-comm m n =
+  begin
+    n + n * m
+  ≡⟨ cong (_+ n * m) (sym (*-identityʳ n)) ⟩
+    n * 1 + n * m
+  ≡⟨ sym (*-distribˡ-+ 1 m n) ⟩
+    n * (1 + m)
+  ≡⟨⟩
+   n * suc m
+  ∎
 ```
 
 
