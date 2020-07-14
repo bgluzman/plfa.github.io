@@ -1019,17 +1019,10 @@ you will need to formulate and prove suitable lemmas.
 
 *-comm : ∀ (m n : ℕ) → m * n ≡ n * m
 *-comm zero n rewrite *-zeroʳ n = refl
-*-comm (suc m) n rewrite *-distribˡ-+ m 1 n
-                       | *-comm m n =
-  begin
-    n + n * m
-  ≡⟨ cong (_+ n * m) (sym (*-identityʳ n)) ⟩
-    n * 1 + n * m
-  ≡⟨ sym (*-distribˡ-+ 1 m n) ⟩
-    n * (1 + m)
-  ≡⟨⟩
-   n * suc m
-  ∎
+*-comm (suc m) n rewrite *-distrib-+ m 1 n
+                       | *-distribˡ-+ 1 m n
+                       | *-identityʳ n
+                       | *-comm m n = refl
 ```
 
 
