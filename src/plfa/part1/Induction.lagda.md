@@ -1135,7 +1135,45 @@ over bitstrings:
 For each law: if it holds, prove; if not, give a counterexample.
 
 ```
--- Your code goes here
+data Bin : Set where
+  ⟨⟩ : Bin
+  _O : Bin → Bin
+  _I : Bin → Bin
+
+inc : Bin → Bin
+inc ⟨⟩ = ⟨⟩ I
+inc (b O) = b I
+inc (b I) = (inc b) O
+
+to : ℕ → Bin
+to zero = ⟨⟩ O
+to (suc n) = inc (to n)
+
+from : Bin → ℕ
+from ⟨⟩ = zero
+from (b O) = 2 * from b
+from (b I) = 1 + 2 * from b
+
+bin-from-inc : ∀ (b : Bin) → from (inc b) ≡ suc (from b)
+bin-from-inc ⟨⟩ = refl
+bin-from-inc (b O) = refl
+bin-from-inc (b I) rewrite +-identityʳ (from b)
+                         | +-identityʳ (from (inc b))
+                         | bin-from-inc b
+                         | +-comm 1 (from b)
+                         | +-comm (from b) (from b + 1)
+                         | +-comm (from b) 1
+                         = refl
+
+-- DOES NOT HOLD: to (from b) ≡ b
+_ : to (from ⟨⟩) ≡ ⟨⟩ O
+_ = refl
+
+bin-from-to : ∀ (n : ℕ) → from (to n) ≡ n
+bin-from-to zero = refl
+bin-from-to (suc n) rewrite bin-from-inc (to n)
+                          | bin-from-to n
+                          = refl
 ```
 
 
