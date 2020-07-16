@@ -1035,7 +1035,9 @@ Show
 for all naturals `n`. Did your proof require induction?
 
 ```
--- Your code goes here
+∸-zero : ∀ (n : ℕ) → zero ∸ n ≡ zero
+∸-zero zero = refl
+∸-zero (suc n) = refl
 ```
 
 
@@ -1048,7 +1050,21 @@ Show that monus associates with addition, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```
--- Your code goes here
+∸-suc-minus-one : ∀ (m : ℕ) → m ≡ suc m ∸ 1
+∸-suc-minus-one m = refl
+
+∸-suc : ∀ (m n : ℕ) →  m ∸ 1 ∸ n ≡ m ∸ suc n
+∸-suc zero n rewrite ∸-zero n = refl
+∸-suc (suc m) n rewrite ∸-suc-minus-one n = refl
+
+∸-+-assoc : ∀ (m n p : ℕ) → m ∸ n ∸ p ≡ m ∸ (n + p)
+∸-+-assoc m zero p = refl
+∸-+-assoc m (suc n) p rewrite +-comm 1 n
+                            | sym (∸-+-assoc m n 1)
+                            | ∸-suc (m ∸ n) p
+                            | ∸-+-assoc m n (suc p)
+                            | sym (+-assoc n 1 p)
+                            | +-comm n 1 = refl
 ```
 
 
