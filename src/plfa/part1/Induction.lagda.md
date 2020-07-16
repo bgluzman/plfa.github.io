@@ -1064,7 +1064,8 @@ for all naturals `m`, `n`, and `p`.
                             | ∸-suc (m ∸ n) p
                             | ∸-+-assoc m n (suc p)
                             | sym (+-assoc n 1 p)
-                            | +-comm n 1 = refl
+                            | +-comm n 1
+                            = refl
 ```
 
 
@@ -1077,6 +1078,36 @@ Show the following three laws
      (m ^ n) ^ p ≡ m ^ (n * p)        (^-*-assoc)
 
 for all `m`, `n`, and `p`.
+
+```
+_^_ : ℕ → ℕ → ℕ
+m ^ zero = 1
+m ^ suc n = m * m ^ n
+
+^-distribˡ-+-* : ∀ (m n p : ℕ) → m ^ (n + p) ≡ (m ^ n) * (m ^ p)
+^-distribˡ-+-* m zero p rewrite +-identityʳ (m ^ p) = refl
+^-distribˡ-+-* m (suc n) p rewrite ^-distribˡ-+-* m n p
+                                 | sym (*-assoc m (m ^ n) (m ^ p))
+                                 = refl
+
+^-distribʳ-* : ∀ (m n p : ℕ) → (m * n) ^ p ≡ (m ^ p) * (n ^ p)
+^-distribʳ-* m n zero = refl
+^-distribʳ-* m n (suc p) rewrite ^-distribʳ-* m n p
+                               | sym (*-assoc (m * n) (m ^ p) (n ^ p))
+                               | *-assoc m n (m ^ p)
+                               | *-comm n (m ^ p)
+                               | *-assoc m ((m ^ p) * n) (n ^ p)
+                               | *-assoc (m ^ p) n (n ^ p)
+                               | sym (*-assoc m (m ^ p) (n * (n ^ p)))
+                               = refl
+
+^-*-assoc : ∀ (m n p : ℕ) → (m ^ n) ^ p ≡ m ^ (n * p)
+^-*-assoc m n zero rewrite *-zeroʳ n = refl
+^-*-assoc m n (suc p) rewrite ^-*-assoc m n p
+                            | sym (^-distribˡ-+-* m n (n * p))
+                            | *-distribˡ-+ 1 p n
+                            | *-identityʳ n = refl
+```
 
 
 #### Exercise `Bin-laws` (stretch) {#Bin-laws}
