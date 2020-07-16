@@ -1054,12 +1054,9 @@ Show that monus associates with addition, that is,
 for all naturals `m`, `n`, and `p`.
 
 ```
-∸-suc-minus-one : ∀ (m : ℕ) → m ≡ suc m ∸ 1
-∸-suc-minus-one m = refl
-
 ∸-suc : ∀ (m n : ℕ) →  m ∸ 1 ∸ n ≡ m ∸ suc n
 ∸-suc zero n rewrite ∸-zero n = refl
-∸-suc (suc m) n rewrite ∸-suc-minus-one n = refl
+∸-suc (suc m) n = refl
 
 ∸-+-assoc : ∀ (m n p : ℕ) → m ∸ n ∸ p ≡ m ∸ (n + p)
 ∸-+-assoc m zero p = refl
