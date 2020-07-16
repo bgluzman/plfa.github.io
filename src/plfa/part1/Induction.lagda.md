@@ -1010,17 +1010,21 @@ you will need to formulate and prove suitable lemmas.
 *-identityʳ zero = refl
 *-identityʳ (suc n) rewrite *-identityʳ n = refl
 
-*-distribˡ-+ : ∀ (m n p : ℕ) → p * (m + n) ≡ p * m + p * n
-*-distribˡ-+ m n zero = refl
-*-distribˡ-+ m n (suc p) rewrite *-distribˡ-+ m n p
-                               | +-rearrange m n (p * m) (p * n)
-                               | +-comm n (p * m)
-                               | sym (+-rearrange m (p * m) n (p * n)) = refl
+*-distribˡ-+ : ∀ (m n p : ℕ) → m * (n + p) ≡ m * n + m * p
+*-distribˡ-+ zero n p = refl
+*-distribˡ-+ (suc m) n p rewrite *-distrib-+ m 1 (n + p)
+                               | *-distribˡ-+ m n p
+                               | +-assoc n p (m * n + m * p)
+                               | sym (+-assoc p (m * n) (m * p))
+                               | +-comm p (m * n)
+                               | +-assoc (m * n) p (m * p)
+                               | sym (+-assoc n (m * n) (p + m * p))
+                               = refl
 
 *-comm : ∀ (m n : ℕ) → m * n ≡ n * m
 *-comm zero n rewrite *-zeroʳ n = refl
 *-comm (suc m) n rewrite *-distrib-+ m 1 n
-                       | *-distribˡ-+ 1 m n
+                       | *-distribˡ-+ n 1 m
                        | *-identityʳ n
                        | *-comm m n = refl
 ```
@@ -1105,7 +1109,7 @@ m ^ suc n = m * m ^ n
 ^-*-assoc m n zero rewrite *-zeroʳ n = refl
 ^-*-assoc m n (suc p) rewrite ^-*-assoc m n p
                             | sym (^-distribˡ-+-* m n (n * p))
-                            | *-distribˡ-+ 1 p n
+                            | *-distribˡ-+ n 1 p
                             | *-identityʳ n = refl
 ```
 
