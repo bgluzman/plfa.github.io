@@ -900,7 +900,17 @@ successor of the sum of two even numbers, which is even.
 Show that the sum of two odd numbers is even.
 
 ```
--- Your code goes here
+e+o≡o : ∀ {m n : ℕ}
+  → even m
+  → odd n
+  → odd (m + n)
+e+o≡o {m} {n} em on rewrite +-comm m n = o+e≡o on em
+
+o+o≡e : ∀ {m n : ℕ}
+  → odd m
+  → odd n
+  → even (m + n)
+o+o≡e (suc em) on = suc (e+o≡o em on)
 ```
 
 #### Exercise `Bin-predicates` (stretch) {#Bin-predicates}
