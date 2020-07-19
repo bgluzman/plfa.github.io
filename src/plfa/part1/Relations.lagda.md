@@ -234,13 +234,21 @@ partial order but not a total order.
 Give an example of a preorder that is not a partial order.
 
 ```
--- Your code goes here
+-- from wikipedia: reachability in a graph
+-- take the graph A → B, B → A, then A ≤ B and B ≤ A (since they
+-- are reachable from one another) but they are not the same node
 ```
 
 Give an example of a partial order that is not a total order.
 
 ```
--- Your code goes here
+-- reachability in a dag
+-- take the dag A → B, A → C, B → D, C → D, then X ≤ Y and Y ≤ X for
+-- any two nodes implies that you can reach Y from X and X from Y.
+-- but by defintion, a dag cannot have cycles which can only mean
+-- these are the same node. on the other hand, there is no way to
+-- order B and C because B is not reachable from C and C is not
+-- reachable from B, so no relation exists between them.
 ```
 
 ## Reflexivity
@@ -264,6 +272,13 @@ n`, and applying `s≤s` to that yields a proof of `suc n ≤ suc n`.
 It is a good exercise to prove reflexivity interactively in Emacs,
 using holes and the `C-c C-c`, `C-c C-,`, and `C-c C-r` commands.
 
+```
+-- emacs practice:
+≤-refl′ : ∀ {n : ℕ}
+  → n ≤ n
+≤-refl′ {zero} = z≤n
+≤-refl′ {suc n} = s≤s ≤-refl′
+```
 
 ## Transitivity
 
@@ -318,6 +333,16 @@ out to be immensely valuable, and one that we use often.
 Again, it is a good exercise to prove transitivity interactively in Emacs,
 using holes and the `C-c C-c`, `C-c C-,`, and `C-c C-r` commands.
 
+```
+-- emacs practice:
+≤-trans″ : ∀ {m n p : ℕ}
+  → m ≤ n
+  → n ≤ p
+    -----
+  → m ≤ p
+≤-trans″ z≤n       _         = z≤n
+≤-trans″ (s≤s m≤n) (s≤s n≤p) = s≤s (≤-trans″ m≤n n≤p)
+```
 
 ## Anti-symmetry
 
@@ -347,13 +372,30 @@ and `suc n ≤ suc m` and must show `suc m ≡ suc n`.  The inductive
 hypothesis `≤-antisym m≤n n≤m` establishes that `m ≡ n`, and our goal
 follows by congruence.
 
+```
+-- emacs practice:
+≤-antisym′ : ∀ {m n : ℕ}
+  → m ≤ n
+  → n ≤ m
+    -----
+  → m ≡ n
+≤-antisym′ z≤n       z≤n       = refl
+≤-antisym′ (s≤s m≤n) (s≤s n≤m) = cong suc (≤-antisym′ m≤n n≤m)
+```
+
 #### Exercise `≤-antisym-cases` (practice) {#leq-antisym-cases}
 
 The above proof omits cases where one argument is `z≤n` and one
 argument is `s≤s`.  Why is it ok to omit them?
 
 ```
--- Your code goes here
+-- If the first argument is z≤n, then we can infer that m ≡ zero
+-- which means the second argument is n ≤ 0 which implies that
+-- n ≡ 0 by inv-z≤n. Similarly, if the second argument is z≤n,
+-- then this implies that n ≡ zero which means that the the first
+-- argument is m ≤ 0 again implies m ≡ 0. In both cases, then,
+-- we have m ≡ n ≡ 0 derivable from inference/reflexivity, so we
+-- do not need to prove the aforementioned cases explicitly.
 ```
 
 
@@ -480,6 +522,12 @@ variant that returns the flipped case:
 It differs from the original code in that it pattern
 matches on the second argument before the first argument.
 
+```
+-- experiment:
+≤-total-eq : ∀ (n : ℕ) → Total n n
+≤-total-eq zero = forward z≤n
+≤-total-eq (suc n) = forward (s≤s ≤-refl)
+```
 
 ## Monotonicity
 
@@ -543,7 +591,30 @@ transitivity proves `m + p ≤ n + q`, as was to be shown.
 Show that multiplication is monotonic with regard to inequality.
 
 ```
--- Your code goes here
+open import Data.Nat using (_*_)
+open import Data.Nat.Properties using (*-comm)
+
+*-monoʳ-≤ : ∀ (n p q)
+  → p ≤ q
+    -------------
+  → n * p ≤ n * q
+*-monoʳ-≤ zero p q p≤q = z≤n
+*-monoʳ-≤ (suc n) p q p≤q = +-mono-≤ p q (n * p) (n * q)
+                                     p≤q
+                                     (*-monoʳ-≤ n p q p≤q)
+
+*-monoˡ-≤ : ∀ (m n p : ℕ)
+  → m ≤ n
+    -------------
+  → m * p ≤ n * p
+*-monoˡ-≤ m n p m≤n rewrite *-comm m p | *-comm n p = *-monoʳ-≤ p m n m≤n
+
+*-mono-≤ : ∀ (m n p q)
+  → m ≤ n
+  → p ≤ q
+    -------------
+  → m * p ≤ n * q
+*-mono-≤ m n p q m≤n p≤q = ≤-trans (*-monoˡ-≤ m n p m≤n) (*-monoʳ-≤ n p q p≤q)
 ```
 
 
