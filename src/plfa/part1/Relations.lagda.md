@@ -750,7 +750,28 @@ As with inequality, some additional definitions may be required.
 Show that `suc m ≤ n` implies `m < n`, and conversely.
 
 ```
--- Your code goes here
+≤-suc-< : ∀ {m n : ℕ}
+  → m ≤ n
+  → m < suc n
+≤-suc-< z≤n = z<s
+≤-suc-< (s≤s m≤n) = s<s (≤-suc-< m≤n)
+
+≤-iff-<-forward : ∀ {m n : ℕ}
+  → suc m ≤ n
+  → m < n
+≤-iff-<-forward (s≤s sm≤n) = ≤-suc-< sm≤n
+
+<-suc-≤ : ∀ {m n : ℕ}
+  → m < n
+  → suc m ≤ n
+<-suc-≤ z<s = s≤s z≤n
+<-suc-≤ (s<s m<n) = s≤s (<-suc-≤ m<n)
+
+≤-iff-<-backward : ∀ {m n : ℕ}
+  → m < n
+  → suc m ≤ n
+≤-iff-<-backward z<s = s≤s z≤n
+≤-iff-<-backward (s<s m<n) = s≤s (<-suc-≤ m<n)
 ```
 
 #### Exercise `<-trans-revisited` (practice) {#less-trans-revisited}
@@ -760,7 +781,19 @@ using the relation between strict inequality and inequality and
 the fact that inequality is transitive.
 
 ```
--- Your code goes here
+<-suc : ∀ (m n : ℕ)
+  → suc m < n
+  → m < n
+<-suc zero    (suc n)  _ = z<s
+<-suc (suc m) (suc n) (s<s sm<n) = s<s (<-suc m n sm<n)
+
+<-trans-revisited : ∀ {m n p : ℕ}
+  → m < n
+  → n < p
+  → m < p
+<-trans-revisited m<n n<p = <-suc _ _
+                                 (≤-iff-<-forward (≤-trans (s≤s (≤-iff-<-backward m<n))
+                                                           (≤-iff-<-backward n<p)))
 ```
 
 
