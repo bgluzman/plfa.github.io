@@ -661,7 +661,13 @@ exploiting the corresponding properties of inequality.
 Show that strict inequality is transitive.
 
 ```
--- Your code goes here
+<-trans : ∀ {m n p : ℕ}
+  → m < n
+  → n < p
+    -----
+  → m < p
+<-trans z<s (s<s n<p) = z<s
+<-trans (s<s m<n) (s<s n<p) = s<s (<-trans m<n n<p)
 ```
 
 #### Exercise `trichotomy` (practice) {#trichotomy}
