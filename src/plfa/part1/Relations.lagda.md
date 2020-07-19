@@ -685,7 +685,40 @@ similar to that used for totality.
 [negation]({{ site.baseurl }}/Negation/).)
 
 ```
--- Your code goes here
+infix 4 _>_
+data _>_ : ℕ → ℕ → Set where
+
+  s>z : ∀ {n : ℕ}
+      ------------
+    → suc n > zero
+
+  s>s : ∀ {m n : ℕ}
+    → m > n
+      -------------
+    → suc m > suc n
+
+data Trichotomy (m n : ℕ) : Set where
+
+  forward :
+      m > n
+    → Trichotomy m n
+
+  flipped :
+      n > m
+    → Trichotomy m n
+
+  same :
+      m ≡ n
+    → Trichotomy m n
+
+<-trichotomy : ∀ (m n : ℕ) → Trichotomy m n
+<-trichotomy zero zero = same refl
+<-trichotomy zero (suc n) = flipped s>z
+<-trichotomy (suc m) zero = forward s>z
+<-trichotomy (suc m) (suc n) with <-trichotomy m n
+...                             | forward m>n = forward (s>s m>n)
+...                             | flipped n>m = flipped (s>s n>m)
+...                             | same    m≡n = same (cong suc m≡n)
 ```
 
 #### Exercise `+-mono-<` (practice) {#plus-mono-less}
