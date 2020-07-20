@@ -1008,20 +1008,44 @@ data Can : Bin → Set where
 
   one : ∀ {b : Bin}
     → One b
+      -----
     → Can b
 
-inc-one : {b : Bin}
+inc-one : ∀ {b : Bin}
   → One b
+    -----------
   → One (inc b)
 inc-one singleton = zero singleton
 inc-one (zero ob) = one ob
 inc-one (one ob) = zero (inc-one ob)
 
-inc-can : {b : Bin}
+inc-can : ∀ {b : Bin}
   → Can b
+    -----------
   → Can (inc b)
 inc-can singleton = one singleton
 inc-can (one ob) = one (inc-one ob)
+
+to-can : ∀ (n : ℕ)
+    ----------
+  → Can (to n)
+to-can zero = singleton
+to-can (suc n) = inc-can (to-can n)
+
+to-from-one : ∀ {b : Bin}
+  → One b
+    ---------------
+  → to (from b) ≡ b
+to-from-one singleton = refl
+to-from-one (zero ob) = {!!}
+to-from-one (one ob) = {!!}
+
+to-from-can : ∀ {b : Bin}
+  → Can b
+    ---------------
+  → to (from b) ≡ b
+to-from-can singleton = refl
+to-from-can (one ob) = to-from-one ob
 ```
 
 ## Standard library
